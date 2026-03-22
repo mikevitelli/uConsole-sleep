@@ -130,7 +130,7 @@ if not backlight_path:
 
 uinput_path = "/dev/uinput"
 if not os.path.exists(uinput_path):
-    raise FileNotFoundError(f"{file_path} 파일이 존재하지 않습니다.")
+    raise FileNotFoundError(f"{uinput_path} does not exist.")
 
 uinput_device = uinput.Device([uinput.KEY_SLEEP, uinput.KEY_WAKEUP])
 
@@ -244,7 +244,6 @@ cat << 'EOF' > uconsole-sleep/usr/local/src/uconsole-sleep/sleep_power_control.p
 import os
 import time
 from inotify_simple import INotify, flags
-#from find_drm_panel import find_drm_panel
 from find_backlight import find_backlight
 from find_internal_kb import find_internal_kb
 
@@ -289,7 +288,6 @@ def control_by_state(state):
 
 
 backlight_path = find_backlight()
-#drm_panel_path = find_drm_panel()
 kb_device_path = find_internal_kb()
 kb_device_id = os.path.basename(kb_device_path)
 usb_driver_path = "/sys/bus/usb/drivers/usb"
@@ -297,9 +295,6 @@ cpu_policy_path = "/sys/devices/system/cpu/cpufreq/policy0"
 
 if not backlight_path:
     raise Exception("there's no matched backlight")
-
-#if not drm_panel_path:
-#    raise Exception("there's no matched drm panel")
 
 if not kb_device_path:
     raise Exception("there's no matched kb")
@@ -331,13 +326,8 @@ backlight_bl_path = os.path.join(backlight_path, "bl_power")
 with open(backlight_bl_path, "r") as f:
     screen_state = f.read().strip()
 
-#drm_enabled_path = os.path.join(drm_panel_path, "enabled")
-#with open(drm_enabled_path, "r") as f:
-#    screen_state = f.read().strip()
-
 try:
     control_by_state(screen_state != "4")
-#    control_by_state(screen_state != "disabled")
 except Exception as e:
     print(f"Error occurred: {e}, on init. ignored")
 
